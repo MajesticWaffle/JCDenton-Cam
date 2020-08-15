@@ -4,7 +4,7 @@ import javax.swing.*;
 
 public class Application {
 
-    public Application(){
+    public Application(double[] values){
         AudioFormat format = new AudioFormat(16000.0f, 8, 2, true, true);
         Microphone microphone = null;
         try {
@@ -15,17 +15,26 @@ public class Application {
             System.exit(1);
         }
 
-        GUIWindow window = new GUIWindow();
-        window.setVisible(true);
-        while(window.isVisible()){
-            double level = microphone.volumeRMS(microphone.SampleAudioBytes(128), 0, 128);
-            System.out.println(level);
-            window.updateVolume(level);
+        PreviewWindow view = new PreviewWindow(values);
+        view.setVisible(true);
+        byte[] samples;
+
+        while(view.isVisible()){
+            samples = microphone.SampleAudioBytes(128);
+            double level = microphone.volumeRMS(samples, 0, 128);
+            view.updateVolume(level);
         }
 
     }
 
     public static void main(String[] args){
-        Application app = new Application();
+        double[] values = new double[]{0.65, 2 ,4};
+        if(args.length >= 3){
+            values[0] = Double.valueOf(args[0]);
+            values[1] = Double.valueOf(args[1]);
+            values[2] = Double.valueOf(args[2]);
+        }
+
+        new Application(values);
     }
 }

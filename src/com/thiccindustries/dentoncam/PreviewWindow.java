@@ -3,11 +3,12 @@ package com.thiccindustries.dentoncam;
 import javax.swing.*;
 import java.awt.*;
 
-public class GUIWindow extends JFrame {
+public class PreviewWindow extends JFrame {
 
-    private MyCanvas canvas = new MyCanvas(new double[]{0.65, 2 ,4});
+    private MyCanvas canvas;
 
-    public GUIWindow(){
+    public PreviewWindow(double[] values){
+        canvas = new MyCanvas(values);
         setLayout(new BorderLayout());
         setTitle("Denton Cam");
         setResizable(false);
@@ -20,12 +21,7 @@ public class GUIWindow extends JFrame {
         setLocationRelativeTo(null);
     }
 
-    public void setWindowVisible(boolean visible){
-        setVisible(visible);
-    }
-
     public void updateVolume(double volume){
-        System.out.println(volume);
         canvas.UpdateVolume(volume);
     }
 }
