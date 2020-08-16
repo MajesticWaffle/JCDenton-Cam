@@ -7,12 +7,11 @@ public class PreviewWindow extends JFrame {
 
     private MyCanvas canvas;
 
-    public PreviewWindow(double[] values){
-        canvas = new MyCanvas(values);
+    public PreviewWindow(double[] values, String filepath){
+        canvas = new MyCanvas(values, filepath);
         setLayout(new BorderLayout());
         setTitle("Denton Cam");
         setResizable(false);
-        canvas.setPreferredSize(new Dimension(465, 465));
         add("Center", canvas);
 
         pack();
@@ -30,15 +29,25 @@ class MyCanvas extends JPanel{
     private double[] volumeThresholds;
     private double currentVolume = 0;
 
-    private final Image[] dentonStates = {
-            new ImageIcon( getClass().getResource("res/stage0.png") ).getImage(),
-            new ImageIcon( getClass().getResource("res/stage1.png") ).getImage(),
-            new ImageIcon( getClass().getResource("res/stage2.png") ).getImage(),
-            new ImageIcon( getClass().getResource("res/stage3.png") ).getImage(),
-    };
+    private final Image[] dentonStates;
 
-    public MyCanvas(double[] volumeStates){
+    private int ix, iy;
+
+    public MyCanvas(double[] volumeStates, String filePath){
+
         volumeThresholds = volumeStates;
+
+        dentonStates = new Image[]{
+                new ImageIcon(filePath + "/stage0.png" ).getImage(),
+                new ImageIcon(filePath + "/stage1.png" ).getImage(),
+                new ImageIcon(filePath + "/stage2.png" ).getImage(),
+                new ImageIcon(filePath + "/stage3.png" ).getImage(),
+        };
+
+        ix = dentonStates[0].getWidth(this);
+        iy = dentonStates[0].getHeight(this);
+
+        setPreferredSize(new Dimension(ix, iy));
     }
 
     @Override
@@ -62,4 +71,5 @@ class MyCanvas extends JPanel{
         repaint();
 
     }
+
 }
