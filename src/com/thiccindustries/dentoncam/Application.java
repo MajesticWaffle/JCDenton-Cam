@@ -21,12 +21,20 @@ public class Application {
         view.setVisible(true);
         byte[] samples;
 
+
+
         while(view.isVisible()){
-            samples = microphone.SampleAudioBytes(128);
+            /*samples = microphone.SampleAudioBytes(128);
             double level = microphone.volumeRMS(samples, 0, 128);
             view.updateVolume(level);
             DecimalFormat df = new DecimalFormat("###.##");
-            System.out.println("Microphone level: " + df.format(level));
+            System.out.println("Microphone level: " + df.format(level));*/
+            samples = microphone.SampleAudioBytes(128);
+
+            for(byte b : samples){
+                System.out.print(b + " ");
+            }
+            System.out.println("");
         }
 
     }

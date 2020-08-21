@@ -10,7 +10,7 @@ public class PreviewWindow extends JFrame {
     public PreviewWindow(double[] values, String filepath){
         canvas = new MyCanvas(values, filepath);
         setLayout(new BorderLayout());
-        setTitle("Denton Cam");
+        setTitle("Denton Cam Output");
         setResizable(false);
         add("Center", canvas);
 
