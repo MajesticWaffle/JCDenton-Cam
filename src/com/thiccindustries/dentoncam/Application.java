@@ -6,7 +6,7 @@ import java.text.DecimalFormat;
 
 public class Application {
 
-    public Application(double[] values, String filepath){
+    public Application(double minVolume, double maxVolume, String filepath){
         AudioFormat format = new AudioFormat(16000.0f, 8, 2, true, true);
         Microphone microphone = null;
         try {
@@ -17,7 +17,7 @@ public class Application {
             System.exit(1);
         }
 
-        PreviewWindow view = new PreviewWindow(values, filepath);
+        PreviewWindow view = new PreviewWindow(minVolume, maxVolume, filepath);
         view.setVisible(true);
         byte[] samples;
 
@@ -26,25 +26,26 @@ public class Application {
             double level = microphone.volumeRMS(samples, 0, 128);
             view.updateVolume(level);
             DecimalFormat df = new DecimalFormat("###.##");
-            System.out.println("Microphone level: " + df.format(level));
         }
 
     }
 
     public static void main(String[] args){
-        double[] values = new double[]{0.8, 2 ,5};
-        String filepath = "./res";
+        //Define defaults
+        double minVol = 0.75;
+        double maxVol = 5;
+        String filepath = "E:\\User Folders\\Desktop\\newtest";
+
         if(args.length >= 1){
             filepath = args[0];
         }
 
-        if(args.length >= 4){
+        if(args.length >= 3){
             filepath = args[0];
-            values[0] = Double.valueOf(args[1]);
-            values[1] = Double.valueOf(args[2]);
-            values[2] = Double.valueOf(args[3]);
+            minVol = Double.parseDouble(args[1]);
+            maxVol = Double.parseDouble(args[2]);
         }
-        System.out.println(new File(filepath).getAbsolutePath());
-        new Application(values, filepath);
+
+        new Application(minVol, maxVol, filepath);
     }
 }
