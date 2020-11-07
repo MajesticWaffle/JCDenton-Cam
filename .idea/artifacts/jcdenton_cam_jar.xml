@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="jcdenton-cam:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/jcdenton_cam_jar</output-path>
-    <root id="archive" name="jcdenton-cam.jar">
-      <element id="module-output" name="jcdenton-cam" />
-    </root>
-  </artifact>
-</component>
