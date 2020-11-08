@@ -1,7 +1,10 @@
 package com.thiccindustries.dentoncam;
 
-import javax.sound.sampled.*;
-import javax.swing.*;
+import javax.sound.sampled.TargetDataLine;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.DataLine;
+import javax.sound.sampled.AudioSystem;
 
 public class Microphone {
 
@@ -26,7 +29,7 @@ public class Microphone {
         return audioBuffer;
     }
 
-    /** Computes the RMS volume of a group of signal sizes */
+    /* Computes the RMS volume of a group of signal sizes */
     public double volumeRMS(byte[] audioData, int start, int length) {
         long sum = 0;
         int end = start + length;
@@ -43,15 +46,13 @@ public class Microphone {
         }
         double average = (double)sum/len;
 
-        double sumMeanSquare = 0;;
+        double sumMeanSquare = 0;
         for (int i=start; i<end; i++) {
             double f = audioData[i] - average;
             sumMeanSquare += f * f;
         }
         double averageMeanSquare = sumMeanSquare/len;
-        double rootMeanSquare = Math.sqrt(averageMeanSquare);
-
-        return rootMeanSquare;
+        return Math.sqrt(averageMeanSquare);
     }
 
 
