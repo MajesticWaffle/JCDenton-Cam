@@ -68,12 +68,24 @@ public class Application {
         }
 
         //Create console window
-        ConsoleWindow console = new ConsoleWindow();
+        new ConsoleWindow();
 
-        //Init program variables
+        //Get number of valid images in selected directory
         int numStates = GetStageCountFromFilePath(filepath);
+        if(numStates == -1)
+            LogErrorAndExit("Empty directory.", -1);
+        if(numStates == -2)
+            LogErrorAndExit("No valid images in directory.", -2);
+
+        //Load images into image array
         imagesArray = PopulateImageArray(filepath, numStates);
+        if(imagesArray == null)
+            LogErrorAndExit("IO Error reading file. Are they properly formatted?", -1);
+
+        //Calculate volume threshold array
         volumeThresholdArray = PopulateThresholdArray(minVolume, maxVolume, numStates - 1);
+        if(volumeThresholdArray == null)
+            LogErrorAndExit("Mathematical error in volume threshold calculation.", -1);
 
         //Create main window and wait for initialization
         PreviewWindow view = new PreviewWindow(this);
@@ -95,19 +107,22 @@ public class Application {
 
     }
 
-    private double[] PopulateThresholdArray(double minVolume, double maxVolume, int numStates) {
+    /*Populates an array of volume thresholds with a given minimum, maximum, and number of indices.*/
+    private static double[] PopulateThresholdArray(double minVolume, double maxVolume, int numStates) {
         double[] volumeThresholdArray = new double[numStates];
 
         DecimalFormat formatter = new DecimalFormat("#.##");
-
 
         System.out.println("Volume range: " + minVolume + " to: " + maxVolume);
         System.out.println("Volume level array: ");
         System.out.print("{ ");
 
-
         for(int i = 0; i < numStates; i++){
             volumeThresholdArray[i] = EvaluateExponentialPoint(minVolume, maxVolume, numStates - 1, i);
+
+            if(volumeThresholdArray[i] == -1)
+                return null;
+
             System.out.print(formatter.format(volumeThresholdArray[i]));
             if(i < numStates - 1){
                 System.out.print(" , ");
@@ -119,15 +134,20 @@ public class Application {
         return volumeThresholdArray;
     }
 
-    /*Creates and samples an exponential function given the two points (0, y1) and (steps, y2)*/
-    private double EvaluateExponentialPoint(double y1, double y2, int steps, int x) {
+    /*Samples an exponential function given the two points (0, minimumVolume) and (numSteps, maximumVolume) at point x = i*/
+    private static double EvaluateExponentialPoint(double minimumVolume, double maximumVolume, int numSteps, int i) {
         //y = a( (a/b)^-1/c ) ^ x
+        double base = Math.pow((minimumVolume / maximumVolume), ( -1f/numSteps ));
 
-        double b = Math.pow((y1 / y2), (-1f/steps));
-        return y1 * Math.pow(b, x);
+        //This shouldn't happen with valid values, but is mathematically possible with a fractional power
+        if(Double.isNaN(base) || Double.isInfinite(base))
+            return -1;
+
+        return minimumVolume * Math.pow(base, i);
     }
 
-    private Image[] PopulateImageArray(String filePath, int numStates) {
+    /*Populates an array of images from a given directory and number of images to load*/
+    private static Image[] PopulateImageArray(String filePath, int numStates) {
         Image[] imageArray = new Image[numStates];
 
         //Populate Image Array
@@ -137,16 +157,15 @@ public class Application {
             try {
                 imageArray[i] = ImageIO.read(new File(filePath + "/stage" + i + ".png"));
             } catch (IOException e) {
-                System.out.println("ERROR: IO Error reading file. Are they properly formatted?");
-                JOptionPane.showMessageDialog(null, "ERROR: IO Error reading file.", "Denton cam", JOptionPane.ERROR_MESSAGE);
-                System.exit(-1);
+                return null;
             }
         }
 
         return imageArray;
     }
 
-    private int GetStageCountFromFilePath(String filePath) {
+    /*Gets the count of valid images in a directory*/
+    private static int GetStageCountFromFilePath(String filePath) {
         System.out.println("Reading directory: " + new File(filePath).getAbsolutePath());
 
         String[] paths;
@@ -154,19 +173,16 @@ public class Application {
 
         paths = resDirectory.list();
 
-        //No images in array
-        if(paths == null){
-            System.out.println("ERROR: Empty directory");
-            JOptionPane.showMessageDialog(null, "ERROR: Empty directory.", "Denton cam", JOptionPane.ERROR_MESSAGE);
-            System.exit(-1);
-        }
+        //No files in directory
+        if(paths == null)
+            return -1;
 
         //Set total to the number of images in the directory
         int total = paths.length;
 
         System.out.println("Files in directory: " + total);
 
-        //Reject any files that aren't meant for denton cam
+        //Remove any files that aren't formatted correctly from the total
         for(String path : paths){
             if(!(path.startsWith("stage") && path.endsWith(".png")))
                 total--;
@@ -174,14 +190,18 @@ public class Application {
 
         System.out.println("Valid images in directory: " + total);
 
-        if(total == 0){
-            System.out.println("ERROR: No valid images in directory");
-            JOptionPane.showMessageDialog(null, "ERROR: No valid images in directory.", "Denton cam", JOptionPane.ERROR_MESSAGE);
-            System.exit(-1);
-        }
+        //Directory has files, but none are valid
+        if(total == 0)
+            return -2;
 
         //Return the total
         return total;
     }
 
+    /*Logs an error in the console and creates an error message with the given error_message, then exits the program with the given error_code.*/
+    private static void LogErrorAndExit(String error_message, int exit_code) {
+        System.out.println("ERROR: " + error_message);
+        JOptionPane.showMessageDialog(null, error_message, "Denton cam", JOptionPane.ERROR_MESSAGE);
+        System.exit(exit_code);
+    }
 }
