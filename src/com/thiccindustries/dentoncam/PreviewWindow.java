@@ -8,7 +8,6 @@ import java.awt.Graphics;
 
 public class PreviewWindow extends JFrame {
 
-    public boolean READY = false;
     public final MyCanvas canvas;
 
     public PreviewWindow(Application application){
@@ -46,7 +45,6 @@ class MyCanvas extends JPanel{
         setPreferredSize(new Dimension(ix, iy));
 
         System.out.println("Starting.");
-        pw.READY = true;
     }
 
     @Override

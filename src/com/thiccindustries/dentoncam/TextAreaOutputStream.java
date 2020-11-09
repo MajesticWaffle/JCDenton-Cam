@@ -6,6 +6,7 @@ package com.thiccindustries.dentoncam;
 
 import java.awt.*;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.List;
 import javax.swing.*;
@@ -57,7 +58,7 @@ public class TextAreaOutputStream
     }
 
     static private String bytesToString(byte[] ba, int str, int len) {
-        try { return new String(ba,str,len,"UTF-8"); } catch(UnsupportedEncodingException thr) { return new String(ba,str,len); } // all JVMs are required to support UTF-8
+        return new String(ba,str,len, StandardCharsets.UTF_8);
     }
 
 // *************************************************************************************************
@@ -79,8 +80,8 @@ public class TextAreaOutputStream
         Appender(JTextArea txtara, int maxlin) {
             textArea =txtara;
             maxLines =maxlin;
-            lengths  =new LinkedList<Integer>();
-            values   =new ArrayList<String>();
+            lengths  =new LinkedList<>();
+            values   =new ArrayList<>();
 
             curLength=0;
             clear    =false;

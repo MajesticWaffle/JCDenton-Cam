@@ -63,8 +63,7 @@ public class Application {
              microphone = new Microphone(format);
              microphone.Open();
         } catch (LineUnavailableException e) {
-            JOptionPane.showMessageDialog(null, "Failed to capture microphone input.", "Denton cam", JOptionPane.ERROR_MESSAGE);
-            System.exit(1);
+            LogErrorAndExit("Failed to capture microphone.", -1);
         }
 
         //Create console window
@@ -73,9 +72,9 @@ public class Application {
         //Get number of valid images in selected directory
         int numStates = GetStageCountFromFilePath(filepath);
         if(numStates == -1)
-            LogErrorAndExit("Empty directory.", -1);
+            LogErrorAndExit("Selected directory is empty.", -1);
         if(numStates == -2)
-            LogErrorAndExit("No valid images in directory.", -2);
+            LogErrorAndExit("Selected directory has no valid images.", -2);
 
         //Load images into image array
         imagesArray = PopulateImageArray(filepath, numStates);
@@ -89,7 +88,6 @@ public class Application {
 
         //Create main window and wait for initialization
         PreviewWindow view = new PreviewWindow(this);
-        while(!view.READY){ /*wait*/ }
         view.setVisible(true);
 
 
@@ -97,6 +95,7 @@ public class Application {
         DecimalFormat df = new DecimalFormat("###.##");
 
         while(view.isVisible()){
+            assert microphone != null;
             samples = microphone.SampleAudioBytes(128);
             double level = microphone.volumeRMS(samples, 0, 128);
 
@@ -199,7 +198,7 @@ public class Application {
     }
 
     /*Logs an error in the console and creates an error message with the given error_message, then exits the program with the given error_code.*/
-    private static void LogErrorAndExit(String error_message, int exit_code) {
+    public static void LogErrorAndExit(String error_message, int exit_code) {
         System.out.println("ERROR: " + error_message);
         JOptionPane.showMessageDialog(null, error_message, "Denton cam", JOptionPane.ERROR_MESSAGE);
         System.exit(exit_code);
